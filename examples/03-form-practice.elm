@@ -15,13 +15,13 @@ type alias Model =
     , password : String
     , passwordAgain : String
     , age : Int
-    , errorMessage : Html Msg
+    , submitted : Bool
     }
 
 
 init : Model
 init =
-    Model "" "" "" 0 (div [ style "color" "green" ] [ text "" ])
+    Model "" "" "" 0 False
 
 
 type Msg
@@ -29,7 +29,7 @@ type Msg
     | Password String
     | PasswordAgain String
     | Age String
-    | Validate
+    | Submit
 
 
 update : Msg -> Model -> Model
@@ -47,27 +47,8 @@ update msg model =
         Age age ->
             { model | age = Maybe.withDefault model.age (String.toInt age) }
 
-        Validate ->
-            if model.password == "" then
-                { model | errorMessage = div [ style "color" "red" ] [ text "Please input password" ] }
-
-            else if String.length model.password < 8 then
-                { model | errorMessage = div [ style "color" "red" ] [ text "Password is too short!" ] }
-
-            else if not (String.any Char.isDigit model.password) then
-                { model | errorMessage = div [ style "color" "red" ] [ text "Password needs to include at least 1 digit" ] }
-
-            else if not (String.any Char.isUpper model.password) then
-                { model | errorMessage = div [ style "color" "red" ] [ text "Password needs to include at least 1 upper character" ] }
-
-            else if not (String.any Char.isLower model.password) then
-                { model | errorMessage = div [ style "color" "red" ] [ text "Password needs to include at least 1 lower character" ] }
-
-            else if model.password /= model.passwordAgain then
-                { model | errorMessage = div [ style "color" "red" ] [ text "Passwords do not match!" ] }
-
-            else
-                { model | errorMessage = div [ style "color" "green" ] [ text "OK" ] }
+        Submit ->
+            { model | submitted = True }
 
 
 view : Model -> Html Msg
@@ -77,7 +58,7 @@ view model =
         , viewInput "password" "Password" model.password Password
         , viewInput "password" "Re-enter Password" model.passwordAgain PasswordAgain
         , viewInput "age" "Age" (String.fromInt model.age) Age
-        , button [ onClick Validate ] [ text "Submit" ]
+        , button [ onClick Submit ] [ text "Submit" ]
         , viewValidation model
         ]
 
@@ -89,4 +70,26 @@ viewInput t p v toMsg =
 
 viewValidation : Model -> Html Msg
 viewValidation model =
-    model.errorMessage
+    if not model.submitted then
+        div [ style "color" "black" ] [ text "Please input your name, password and age" ]
+
+    else if model.password == "" then
+        div [ style "color" "red" ] [ text "Please input password" ]
+
+    else if String.length model.password < 8 then
+        div [ style "color" "red" ] [ text "Password is too short!" ]
+
+    else if not (String.any Char.isDigit model.password) then
+        div [ style "color" "red" ] [ text "Password needs to include at least 1 digit" ]
+
+    else if not (String.any Char.isUpper model.password) then
+        div [ style "color" "red" ] [ text "Password needs to include at least 1 upper character" ]
+
+    else if not (String.any Char.isLower model.password) then
+        div [ style "color" "red" ] [ text "Password needs to include at least 1 lower character" ]
+
+    else if model.password /= model.passwordAgain then
+        div [ style "color" "red" ] [ text "Passwords do not match!" ]
+
+    else
+        div [ style "color" "green" ] [ text "OK" ]
