@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), init, main, update, view, viewCelsiusConverter)
+module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
 import Html exposing (Attribute, Html, div, input, span, text)
